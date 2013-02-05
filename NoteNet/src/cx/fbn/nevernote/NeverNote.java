@@ -3175,16 +3175,18 @@ public class NeverNote extends QMainWindow{
     	toggleAllNotesButton(Global.isToolbarButtonVisible("allNotes"));
     	
     	refreshLinksButton = toolBar.addAction(tr("Refresh Note Links"));
+
+		synchronizeButton.setIcon(new QIcon(iconPath+"synchronize.png"));
     	QIcon refreshLinksIcon = new QIcon(iconPath+"refreshLinks.png");
     	refreshLinksButton.triggered.connect(this, "refreshLinks()");
     	refreshLinksButton.setIcon(refreshLinksIcon);
     	toggleRefreshLinksButton(Global.isToolbarButtonVisible("refreshLinks"));
     	
-    	refreshCurrentLinksButton = toolBar.addAction(tr("Refresh Current Note Links"));
-    	QIcon refreshCurrentLinksIcon = new QIcon(iconPath+"refreshCurrentLinks.png");
-    	refreshCurrentLinksButton.triggered.connect(this, "refreshCurrentLinks()");
-    	refreshCurrentLinksButton.setIcon(refreshCurrentLinksIcon);
-    	toggleRefreshLinksButton(Global.isToolbarButtonVisible("refreshCurrentLinks"));
+//    	refreshCurrentLinksButton = toolBar.addAction(tr("Refresh Current Note Links"));
+//    	QIcon refreshCurrentLinksIcon = new QIcon(iconPath+"refreshCurrentLinks.png");
+//    	refreshCurrentLinksButton.triggered.connect(this, "refreshCurrentLinks()");
+//    	refreshCurrentLinksButton.setIcon(refreshCurrentLinksIcon);
+//    	toggleRefreshLinksButton(Global.isToolbarButtonVisible("refreshCurrentLinks"));
     	
      	//toolBar.addSeparator();
       	//toolBar.addWidget(new QLabel(tr("Quota:")));
@@ -5267,6 +5269,7 @@ public class NeverNote extends QMainWindow{
 		}
 		NotebookTable notebooks = conn.getNotebookTable();
 		for(int i = 0; i < notes.size(); i++){
+			if(notes.get(i).getDeleted()!=0) continue;
 			if(notebooks.isReadOnly(notes.get(i).getNotebookGuid())){
 				System.out.println(notes.get(i).getTitle() + " in read only notebook - could not be linked.");
 				continue;
@@ -5295,6 +5298,7 @@ public class NeverNote extends QMainWindow{
 			}
 			if(relatedNotes!=null){
 				for(Note j : relatedNotes){
+					if(j.getDeleted()!=0) continue;
 					Global.linksTable.setLink(notes.get(i).getGuid(), j.getGuid(), Global.LINK_STRENGTH_FINDRELATED);
 				}
 			}

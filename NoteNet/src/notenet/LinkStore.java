@@ -166,6 +166,7 @@ public static void deleteFileOrDirectory( final File file ) {
     }
 }
 
+
 public void clearLinks() {
 	graphDb.shutdown();
 	deleteFileOrDirectory(new File(DB_PATH));
