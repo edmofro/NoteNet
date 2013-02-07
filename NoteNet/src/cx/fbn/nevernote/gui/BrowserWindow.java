@@ -3475,6 +3475,7 @@ public class BrowserWindow extends QWidget {
 
     }
 	
+	
 	// Source edited
 	@SuppressWarnings("unused")
 	private void sourceEdited() {

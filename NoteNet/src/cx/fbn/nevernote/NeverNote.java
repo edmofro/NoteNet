@@ -5368,11 +5368,14 @@ public class NeverNote extends QMainWindow{
 	
 	private void clearActivation(){
 		Global.activatedNotes.clearAll();
+		noteTableView.selectionModel().reset();
+		browserWindow.showActivation(true);
 	}
 	
 	private void undoActivation(){
 		Global.activatedNotes.undo();
-//		browserWindow.undo();
+		noteTableView.selectionModel().reset();
+		browserWindow.showActivation(true);
 	}
 	
 	// View all notes
