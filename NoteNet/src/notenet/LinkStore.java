@@ -26,8 +26,9 @@ public class LinkStore {
 	GraphDatabaseService graphDb;
 	public boolean setup = false;
 	
-	public LinkStore(){
-		DB_PATH = "/Users/Edwin/workspace/NoteNet/linksDatabase";
+	public LinkStore(String programDirPath){
+		DB_PATH = programDirPath + "/linksDatabase";
+		setup = new File(DB_PATH).exists();
 		graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( DB_PATH );
 		nodeIndex = graphDb.index().forNodes( "nodes" );
 		registerShutdownHook( graphDb );
@@ -48,7 +49,7 @@ public class LinkStore {
 		    tx.finish();
 		}	
 	}
-	
+		
 	public void setLink(String from, String to, double weight){
 		Node fromNode = nodeIndex.get("uid", from).getSingle();
 		Node toNode = nodeIndex.get("uid", to).getSingle();
@@ -113,7 +114,7 @@ public class LinkStore {
 			}
 		}
 		catch(NullPointerException e){
-			System.out.println("Null pointer: " + e.getLocalizedMessage());
+//			System.out.println("Null pointer: " + e.getLocalizedMessage());
 		}
 		return ret;
 	}
@@ -173,6 +174,10 @@ public void clearLinks() {
 	graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( DB_PATH );
 	nodeIndex = graphDb.index().forNodes( "nodes" );
 	registerShutdownHook(graphDb);
+}
+
+public boolean containsNote(String guid) {
+	return nodeIndex.get("uid", guid).getSingle() != null;
 }
 
 }

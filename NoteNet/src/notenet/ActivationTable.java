@@ -26,8 +26,10 @@ public class ActivationTable{
 	
 	private int bound;
 	private int size;
+	private int lastSize;
 	private double minThreshold = 0.1;
 	protected List<ActivationNode> heap;
+	protected List<ActivationNode> lastHeap;
 	final private Comparator<ActivationNode> comparator;
 	private VisualizerWindow visualizer;
 	
@@ -40,9 +42,20 @@ public class ActivationTable{
 		this.bound = bound;
 		size = 0;
 		heap = new ArrayList<ActivationNode>(bound+1);
+		lastHeap = new ArrayList<ActivationNode>(bound+1);
+		lastSize = size;
 	}
 	
 	public void activate(String guid, double actChange, String from, double linkStrength){
+		if(from==null){ // This is the top of the recursive call
+			lastHeap.clear();
+			for(ActivationNode act : heap){
+				lastHeap.add(new ActivationNode(act));
+			}
+			lastSize = size;
+			if(Global.view!=null)
+				Global.view.undoPoint();
+		}
 		if(guid==null) return;
 		ActivationNode act; 
 		int actIndex = heap.indexOf(new ActivationNode(guid)); 
@@ -95,7 +108,7 @@ public class ActivationTable{
 		}
 		if(Global.view!=null){
 			Global.view.removeAll(deactivate);
-			Global.view.fadeAll(heap);
+			Global.view.updateAll(heap);
 		}
 //		if(Global.view!=null) Global.view.start();
 	}
@@ -106,6 +119,26 @@ public class ActivationTable{
 		return ret;
 	}
 	
+	public void clearAll() {
+		if(Global.view!=null){
+			ArrayList<ActivationNode> remove = new ArrayList<ActivationNode>(heap);
+			Global.view.removeAll(remove);
+		}
+		heap.clear();
+		size = 0;		
+	}
+	
+	public void undo(){
+		System.out.println("Undo!");
+		heap.clear();
+		for(ActivationNode act : lastHeap){
+			heap.add(new ActivationNode(act));
+		}
+		size = lastSize;
+		if(Global.view!=null){
+			Global.view.undo();
+		}
+	}
 	
 	
 	
@@ -122,7 +155,7 @@ public class ActivationTable{
 	 */
 	
 	
-	public void insert( final ActivationNode node ) {
+	private void insert( final ActivationNode node ) {
 	    size++;
 	    node.setPosition(size-1);
 	    heap.add(node);
@@ -130,7 +163,7 @@ public class ActivationTable{
 	    //return node;
 	  }
 
-	  public final void clear() {
+	private final void clear() {
 	    heap.clear();
 	    size = 0;
 	  }
@@ -140,7 +173,7 @@ public class ActivationTable{
 	   * of the heap in any way. O(k).
 	   * @return Reference to top-most element of heap
 	   */
-	  public final ActivationNode top() {
+	private final ActivationNode top() {
 	    return heap.get(0);
 	  }
 
@@ -149,7 +182,7 @@ public class ActivationTable{
 	  /**
 	   * Pop an element of the heap. O(lg n) where n is the number of elements in heap.
 	   */
-	  public ActivationNode pop() {
+	private ActivationNode pop() {
 	    ActivationNode returnNode = top();
 	    exchange( 0, size-1 );
 	    heap.remove(size-1);
@@ -249,5 +282,7 @@ public class ActivationTable{
 			  }
 			  return fullyActiveList;
 		}
+
+		
 
 }

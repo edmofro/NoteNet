@@ -20,6 +20,13 @@ public class ActivationNode implements Comparable<ActivationNode>{
 		activation = 0;
 	}
 
+	public ActivationNode(ActivationNode act) {
+		noteGuid = act.noteGuid;
+		activation = act.activation;
+		position = act.position;
+		name = act.name;
+	}
+
 	public double getActivation() {
 		return activation;
 	}

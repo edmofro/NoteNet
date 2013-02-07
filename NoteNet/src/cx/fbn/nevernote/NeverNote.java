@@ -311,7 +311,8 @@ public class NeverNote extends QMainWindow{
     QSpinBox			zoomSpinner;				// Zoom zoom
     QAction				searchClearButton;			// Clear the search field
     QAction				refreshLinksButton;			// Find all links
-    QAction				refreshCurrentLinksButton;	// Find links from current note
+    QAction				clearActivationButton;		// Clear activation
+    QAction				undoActivationButton;		// Undo last activation propagation
     
     SearchPanel			searchLayout;				// Widget to hold search field, zoom, & quota
     
@@ -566,7 +567,6 @@ public class NeverNote extends QMainWindow{
         browserWindow = new BrowserWindow(conn);
         
         //Visualizer window init
-        System.out.println("Setting up vis window");
         visualizerWindow = new VisualizerWindow(this);
         visualizerWindow.setVisible(visualize);
         visualizerWindow.show();
@@ -3182,11 +3182,17 @@ public class NeverNote extends QMainWindow{
     	refreshLinksButton.setIcon(refreshLinksIcon);
     	toggleRefreshLinksButton(Global.isToolbarButtonVisible("refreshLinks"));
     	
-//    	refreshCurrentLinksButton = toolBar.addAction(tr("Refresh Current Note Links"));
-//    	QIcon refreshCurrentLinksIcon = new QIcon(iconPath+"refreshCurrentLinks.png");
-//    	refreshCurrentLinksButton.triggered.connect(this, "refreshCurrentLinks()");
-//    	refreshCurrentLinksButton.setIcon(refreshCurrentLinksIcon);
-//    	toggleRefreshLinksButton(Global.isToolbarButtonVisible("refreshCurrentLinks"));
+    	clearActivationButton = toolBar.addAction(tr("Clear Current Activation"));
+    	QIcon clearActivationIcon = new QIcon(iconPath+"resetActivation.png");
+    	clearActivationButton.triggered.connect(this, "clearActivation()");
+    	clearActivationButton.setIcon(clearActivationIcon);
+    	toggleClearActivationButton(Global.isToolbarButtonVisible("clearActivation"));
+    	
+    	undoActivationButton = toolBar.addAction(tr("Undo Last Activation"));
+    	QIcon undoActivationIcon = new QIcon(iconPath+"undoActivation.png");
+    	undoActivationButton.triggered.connect(this, "undoActivation()");
+    	undoActivationButton.setIcon(undoActivationIcon);
+    	toggleUndoActivationButton(Global.isToolbarButtonVisible("undoActivation"));
     	
      	//toolBar.addSeparator();
       	//toolBar.addWidget(new QLabel(tr("Quota:")));
@@ -3275,9 +3281,13 @@ public class NeverNote extends QMainWindow{
     	contextMenu.addAction(refreshLinksAction);
     	refreshLinksAction.triggered.connect(this, "toggleRefreshLinksButton(Boolean)");
     	
-    	QAction refreshCurrentLinksAction = addContextAction("refreshCurrentLinks", tr("Refresh Current Links"));
-    	contextMenu.addAction(refreshCurrentLinksAction);
-    	refreshCurrentLinksAction.triggered.connect(this, "toggleRefreshCurrentLinksButton(Boolean)");
+    	QAction clearActivationAction = addContextAction("clearActivation", tr("Clear Activation"));
+    	contextMenu.addAction(clearActivationAction);
+    	clearActivationAction.triggered.connect(this, "toggleClearActivationButton(Boolean)");
+    	
+    	QAction undoActivationAction = addContextAction("undoActivation", tr("Undo Last Activation"));
+    	contextMenu.addAction(undoActivationAction);
+    	undoActivationAction.triggered.connect(this, "toggleUndoActivationButton(Boolean)");
     	
     	QAction searchClearAction = addContextAction("searchClear", tr("Search Clear"));
     	contextMenu.addAction(searchClearAction);
@@ -3345,9 +3355,13 @@ public class NeverNote extends QMainWindow{
     	refreshLinksButton.setVisible(toggle);
 		Global.saveToolbarButtonsVisible("refreshLinks", toggle);
     }
-    private void toggleRefreshCurrentLinksButton(Boolean toggle){
-    	refreshCurrentLinksButton.setVisible(toggle);
-		Global.saveToolbarButtonsVisible("refreshCurrentLinks", toggle);
+    private void toggleClearActivationButton(Boolean toggle){
+    	clearActivationButton.setVisible(toggle);
+		Global.saveToolbarButtonsVisible("clearActivation", toggle);
+    }
+    private void toggleUndoActivationButton(Boolean toggle){
+    	undoActivationButton.setVisible(toggle);
+		Global.saveToolbarButtonsVisible("undoActivation", toggle);
     }
     @SuppressWarnings("unused")
 	private void toggleSearchClearButton(Boolean toggle) {
@@ -5269,13 +5283,15 @@ public class NeverNote extends QMainWindow{
 		}
 		NotebookTable notebooks = conn.getNotebookTable();
 		for(int i = 0; i < notes.size(); i++){
-			if(notes.get(i).getDeleted()!=0) continue;
-			if(notebooks.isReadOnly(notes.get(i).getNotebookGuid())){
-				System.out.println(notes.get(i).getTitle() + " in read only notebook - could not be linked.");
+			Note note = notes.get(i);
+			if(note.getDeleted()!=0) continue;
+			if(notebooks.isReadOnly(note.getNotebookGuid())){
+				System.out.println(note.getTitle() + " in read only notebook - could not be linked.");
 				continue;
 			}
+			if(!Global.linksTable.containsNote(note.getGuid())) Global.linksTable.addNote(note.getGuid(), note.getTitle());
 			RelatedQuery query = new RelatedQuery();
-			query.setNoteGuid(notes.get(i).getGuid());
+			query.setNoteGuid(note.getGuid());
 			RelatedResultSpec resultSpec = new RelatedResultSpec();
 			resultSpec.setMaxNotes(5);	
 			List<Note> relatedNotes = null;
@@ -5291,7 +5307,7 @@ public class NeverNote extends QMainWindow{
 			} catch (EDAMSystemException e) {
 				e.printStackTrace();
 			} catch (EDAMNotFoundException e) {
-				System.out.println(notes.get(i).getTitle() + " with Guid " + query.getNoteGuid() + " <> " + notes.get(i).getGuid() + " could not be found.");
+				System.out.println(note.getTitle() + " with Guid " + query.getNoteGuid() + " <> " + note.getGuid() + " could not be found.");
 				e.printStackTrace();
 			} catch (TException e) {
 				e.printStackTrace();
@@ -5299,7 +5315,8 @@ public class NeverNote extends QMainWindow{
 			if(relatedNotes!=null){
 				for(Note j : relatedNotes){
 					if(j.getDeleted()!=0) continue;
-					Global.linksTable.setLink(notes.get(i).getGuid(), j.getGuid(), Global.LINK_STRENGTH_FINDRELATED);
+					if(!Global.linksTable.containsNote(j.getGuid())) Global.linksTable.addNote(j.getGuid(), j.getTitle());
+					Global.linksTable.setLink(note.getGuid(), j.getGuid(), Global.LINK_STRENGTH_FINDRELATED);
 				}
 			}
 		}
@@ -5348,6 +5365,16 @@ public class NeverNote extends QMainWindow{
 			e.printStackTrace();
 		}
 	}
+	
+	private void clearActivation(){
+		Global.activatedNotes.clearAll();
+	}
+	
+	private void undoActivation(){
+		Global.activatedNotes.undo();
+//		browserWindow.undo();
+	}
+	
 	// View all notes
 	@SuppressWarnings("unused")
 	private void allNotes() {

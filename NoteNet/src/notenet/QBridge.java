@@ -16,7 +16,7 @@ public class QBridge extends QObject {
         try
         {
             Method method = view.getClass().getMethod(methodName);
-            System.out.println(method.invoke(view).toString());
+            method.invoke(view);
             return "Success";
         }
         catch (final Exception e)
@@ -29,12 +29,16 @@ public class QBridge extends QObject {
         try
         {
             Method method = view.getClass().getMethod(methodName, String.class);
-            System.out.println(method.invoke(view, param).toString());
+            method.invoke(view, param);
             return "Success";
         }
         catch (final Exception e)
         {
             return "Failure";
         }
+    }
+    
+    public void log(String output){
+    	System.out.println(output);
     }
 }

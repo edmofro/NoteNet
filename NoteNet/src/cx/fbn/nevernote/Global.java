@@ -244,7 +244,7 @@ public class Global {
 			
 		databaseCache = getDatabaseCacheSize();	 // Set database cache size	
 		
-		linksTable = new LinkStore();
+		linksTable = new LinkStore(startupConfig.getProgramDirPath());
 		activatedNotes = new ActivationTable(MAX_ACTIVATED);
 		Global.username = getUserInformation().getUsername();
     }

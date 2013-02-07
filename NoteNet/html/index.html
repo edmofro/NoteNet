@@ -22,6 +22,7 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript">
 // 	setTimeout(test,0); //uncomment for testing code to run	
+	var verbose = false; //set true for log output
 
 	// Pull a javascript script off the queue and evaluate
 	setInterval(function() {
@@ -41,7 +42,9 @@
 					.range(["white","green"]);
 	
 	var nodes = [],
-	links = [];
+	links = [],
+	oldNodes = [],
+	oldLinks = [];
 	
 	var force = d3.layout.force()
 	.nodes(nodes)
@@ -64,6 +67,7 @@
 		.on("click", function(d){click(d.id);});
 	
 	function start() {
+// 		log("Start called here:");
 	//update activation of all of them
 	node.selectAll(".nodeCircle").attr("r", function(d) { return d.activation * nodeRadius + 1})
 		.style("fill", function(d) { return color(d.activation);});
@@ -110,10 +114,6 @@
 	}
 	
 	function tick() {
-// 		if(firstTick){
-// 			bridge.callMethod("loadFinished");
-// 			firstTick = false;
-// 		}
 		node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 	
 		link.attr("x1", function(d) { return d.source.x; })
@@ -187,6 +187,50 @@
 		links.push({source: fromNode, target: toNode, strength: linkStrength});
 	}
 	
+	function undo(){
+		log("Reverting to undo point...\nBefore undo:");	
+		nodes.length = 0;
+		links.length = 0;
+// 		nodes = [];
+// 		links = [];
+		start();
+		log("After clear:");
+		for (var i = 0;  i < oldNodes.length;  i++) {
+            nodes.push(oldNodes[i]);
+        }
+		for (var i = 0;  i < oldLinks.length;  i++) {
+            links.push(oldLinks[i]);
+        }
+		start();
+		log("After undo:");
+	}
+	
+	function undoPoint(){
+		log("Setting undo point here:");
+		oldNodes = [];
+		oldLinks = [];
+		for (var i = 0;  i < nodes.length;  i++) { 
+			oldNodes.push(nodes[i]);            
+        }
+		for (var i = 0;  i < links.length;  i++) {
+            oldLinks.push(links[i]);
+        }
+	}
+	
+	//output current state of nodes and links
+	function log(output){	
+		if(verbose){
+			string = output + "\nNodes:";
+			for (var i = 0;  i < nodes.length;  i++) { 
+				string = string + nodes[i].name + ", ";			         
+	        }
+			string = string + "\nLinks:";
+			for (var i = 0;  i < links.length;  i++) { 
+				string = string + links[i].source.name + " to " + links[i].target.name + ", ";			         
+	        }
+			bridge.log(string);
+		}
+	}
 	
 	//testing code
 	

@@ -57,20 +57,12 @@ public class VisualizerWindow extends QWebView {
 	    public void loadFinished(){	
 	    	this.page().mainFrame().evaluateJavaScript("width = " + this.size().width() + ", height = " + this.size().height() + ";");
 	    	this.page().mainFrame().evaluateJavaScript("svg.attr(\"width\", width).attr(\"height\", height);force.size([width,height]);start();");
-	    	System.out.println("loading " + loadingScriptQueue);
-//	    	this.page().mainFrame().evaluateJavaScript(loadingScriptQueue);
-	    	loadingScriptQueue="";
 	    	loaded=true;
 	    }
 	   
 	    public void executeScript(String script){
 			script += "start();";
 			scriptQueue.offer(script);
-//			if(loaded){		    	
-//				scriptQueue.offer(script);
-//			} else{
-//				loadingScriptQueue += script;
-//			}
 	    }
 	    
 	    public void processScript(){
@@ -88,7 +80,7 @@ public class VisualizerWindow extends QWebView {
 			executeScript(script);
 		}
 	    
-	    public void removeAll(ArrayList<ActivationNode> deactivate) {
+	    public void removeAll(List<ActivationNode> deactivate) {
 			String script = "";
 			for(ActivationNode act : deactivate){
 				String guid = dashReplace(act.getNoteGuid()); //Replace dashes with spaces in potential variable names so they don't confuse javascript
@@ -97,7 +89,7 @@ public class VisualizerWindow extends QWebView {
 			executeScript(script);
 		}
 		
-	    public void fadeAll(List<ActivationNode> heap) {
+	    public void updateAll(List<ActivationNode> heap) {
 	    	String script = "";
 			for(ActivationNode act : heap){
 				String guid = dashReplace(act.getNoteGuid()); //Replace dashes with spaces in potential variable names so they don't confuse javascript
@@ -105,7 +97,7 @@ public class VisualizerWindow extends QWebView {
 			}
 			executeScript(script);		
 		}
-
+	    
 		public void fade(ActivationNode act) {
 			String guid = dashReplace(act.getNoteGuid()); //Replace dashes with spaces in potential variable names so they don't confuse javascript
 			String script = 
@@ -137,8 +129,6 @@ public class VisualizerWindow extends QWebView {
 			if(linkNode!=null){
 				linkNode = dashReplace(linkNode);
 				script +=
-//					"var n" + linkNode + "= findById( '" + linkNode + "');\n" + 
-//					"links.push({source: n" + act.getNoteGuid() + ", target: n" + linkNode + ", strength: " + (int) (linkStrength * 10) + "})\n";
 					"linkNodes( '" + guid + "', '" + linkNode + "', " + linkStrength + ");";
 			}
 			executeScript(script);			
@@ -156,6 +146,17 @@ public class VisualizerWindow extends QWebView {
 			guid = reverseDashReplace(guid);
 			selectionSignal.emit(guid);
 		}
+		
+		public void undo(){
+			scriptQueue.clear();
+			executeScript("undo();");
+		}
+
+		public void undoPoint() {
+			executeScript("undoPoint();");			
+		}
+
+		
 
 
 		
