@@ -3518,7 +3518,7 @@ public class BrowserWindow extends QWidget {
 	}
 	
 	// Show linked notes in links viewer	
-	private void setLinks(){
+	public void setLinks(){
 		String linksText = "This note linked to:<br><br>";
 		Map<String, Double> linksMap = Global.linksTable.getLinks(currentNote.getGuid());
 		User user = Global.getUserInformation();
@@ -3539,7 +3539,7 @@ public class BrowserWindow extends QWidget {
 		int count = 0;
 		for(ActivationNode act : activeNotes){
 			if(count >= Global.MAX_SUGGESTED) break;
-			if(act.getNoteGuid()==this.currentNote.getGuid()) continue;
+			if(act.getNoteGuid().equals(this.currentNote.getGuid())) continue;			
 			Note note = conn.getNoteTable().getNote(act.getNoteGuid(), true, false, false, false, false);
 			String noteURL =  "evernote:///view/" + user.getId() + "/" + user.getShardId() + "/" + note.getGuid() + "/" + note.getGuid() + "/";
 			String link = "<a title=\"" + noteURL + " style=\" color:#69aa35\"\"=\"\" href=\"" + noteURL + ">";// "style=\"color:#69aa35\">";
@@ -3568,8 +3568,6 @@ public class BrowserWindow extends QWidget {
 	}
 	
 	public void showLinks(boolean value) {
-		if(value)
-			setLinks();
 		linksViewer.setVisible(value);
 	}
 	

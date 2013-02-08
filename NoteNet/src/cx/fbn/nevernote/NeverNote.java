@@ -5320,7 +5320,8 @@ public class NeverNote extends QMainWindow{
 				}
 			}
 		}
-		browserWindow.showLinks(true);
+		browserWindow.setLinks();
+		browserWindow.showLinks(false);
 	}
 	
 	// TODO: propogate updating the links table through adding and deleting notes etc.

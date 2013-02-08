@@ -129,7 +129,6 @@ public class ActivationTable{
 	}
 	
 	public void undo(){
-		System.out.println("Undo!");
 		heap.clear();
 		for(ActivationNode act : lastHeap){
 			heap.add(new ActivationNode(act));
