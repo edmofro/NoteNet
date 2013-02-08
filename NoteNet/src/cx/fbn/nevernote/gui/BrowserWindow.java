@@ -44,6 +44,9 @@ import notenet.ActivationNode;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 
 import com.evernote.edam.limits.Constants;
@@ -796,7 +799,7 @@ public class BrowserWindow extends QWidget {
 			if(linksViewer.isVisible()) setLinks();
 			Global.activatedNotes.activate(n.getGuid(), 1, null, -1);
 			Global.activatedNotes.fadeActivation(Global.FADE_PROPORTION);
-			if(activationViewer.isVisible()) setActivated();
+			if(activationViewer.isVisible()) setSuggested();
 		}
 	}
 
@@ -3523,15 +3526,24 @@ public class BrowserWindow extends QWidget {
 	}
 	
 	// Show activated notes in activation viewer
-	private void setActivated(){
-		String activationText = "Currently activated notes:<br><br>";
+	private void setSuggested(){
+		int summaryLength = 100;
+		String activationText = "You might also be interested in<br><br>";
 		List<ActivationNode> activeNotes = Global.activatedNotes.getActivatedNotes();
 		User user = Global.getUserInformation();
+		int count = 0;
 		for(ActivationNode act : activeNotes){
-			Note note = conn.getNoteTable().getNote(act.getNoteGuid(), false, false, false, false, false);
+			if(count >= Global.MAX_SUGGESTED) break;
+			if(act.getNoteGuid()==this.currentNote.getGuid()) continue;
+			Note note = conn.getNoteTable().getNote(act.getNoteGuid(), true, false, false, false, false);
 			String noteURL =  "evernote:///view/" + user.getId() + "/" + user.getShardId() + "/" + note.getGuid() + "/" + note.getGuid() + "/";
-			activationText += "<a title=\"" + noteURL + " style=\" color:#69aa35\"\"=\"\" href=\"" + noteURL + "style=\"color:#69aa35\">" + note.getTitle() + "</a> with strength " + act.getActivation() + "<br>";
-			
+			String title = "<a title=\"" + noteURL + " style=\" color:#69aa35\"\"=\"\" href=\"" + noteURL + "style=\"color:#69aa35\">" + note.getTitle() + "</a>";
+			Document doc = Jsoup.parse(note.getContent());
+			Elements elements = doc.select("p");
+			String summary = elements.first().html();
+			String style = "style = \"float: left; width: 180px; height: 150px; padding: 20 20 20 20; overflow: hidden;\"";
+			activationText += "<div " + style + ">" + title + "<br><p>"+ summary + "<p></div>";
+			count++;
 		}
 		activationViewer.setHtml(activationText);
 	}
@@ -3550,7 +3562,7 @@ public class BrowserWindow extends QWidget {
 	
 	public void showActivation(boolean value) {
 		if(value)
-			setActivated();
+			setSuggested();
 		activationViewer.setVisible(value);
 	}
 

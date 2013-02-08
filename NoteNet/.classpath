@@ -55,5 +55,6 @@
 	<classpathentry kind="lib" path="C:/Users/Edwin/workspace/DJNativeSwing/DJNativeSwing-SWT.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Edwin/Lobo/lobo.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Edwin/Lobo/lobo-pub.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Edwin/workspace/jsoup-1.7.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

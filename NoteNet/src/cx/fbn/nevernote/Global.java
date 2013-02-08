@@ -95,6 +95,7 @@ public class Global {
 	public static double LINK_STRENGTH_FINDRELATED = 0.4; // Strength of link between notes returned by a findRelated query
 	public static double ACTIVAION_PROPOGATION_DAMPENING = 1;
 	public static double ACTIVAION_PROPOGATION_THRESHOLD = 0.3;
+	public static int MAX_SUGGESTED = 3;
     
     
     // These variables deal with where the list of notes appears
