@@ -70,10 +70,12 @@
 // 		log("Start called here:");
 	//update activation of all of them
 	node.selectAll(".nodeCircle").attr("r", function(d) { return d.activation * nodeRadius + 1})
-		.style("fill", function(d) { return color(d.activation);});
+		.style("fill", function(d) { return color(d.activation);})
+		.style("cursor", "pointer");
 //  		.style("opacity", function(d) {return d.activation;});
 	node.selectAll(".nodeText").attr("y", function(d) { return d.activation * nodeRadius * 0.5})
-			.attr("x", function(d) { return d.activation * nodeRadius + 2});
+			.attr("x", function(d) { return d.activation * nodeRadius + 2})			
+			.style("cursor", "pointer");
 	
 	//link stuff
 	link = link.data(force.links(), function(d) { return d.source.id + "-" + d.target.id; });

@@ -6,17 +6,18 @@ import com.trolltech.qt.core.QObject;
 
 public class QBridge extends QObject {	
 	
-	VisualizerWindow view;
+	Object parent;
 	
-	public QBridge(VisualizerWindow view){
-		this.view = view;
+	public QBridge(Object parent){
+		this.parent = parent;
 	}
+	
 
     public String callMethod(String methodName){
         try
         {
-            Method method = view.getClass().getMethod(methodName);
-            method.invoke(view);
+            Method method = parent.getClass().getMethod(methodName);
+            method.invoke(parent);
             return "Success";
         }
         catch (final Exception e)
@@ -28,8 +29,8 @@ public class QBridge extends QObject {
     public String callMethod(String methodName, String param){
         try
         {
-            Method method = view.getClass().getMethod(methodName, String.class);
-            method.invoke(view, param);
+            Method method = parent.getClass().getMethod(methodName, String.class);
+            method.invoke(parent, param);
             return "Success";
         }
         catch (final Exception e)

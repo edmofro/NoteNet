@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import notenet.ActivationNode;
+import notenet.QBridge;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -75,6 +76,7 @@ import com.trolltech.qt.core.QFile;
 import com.trolltech.qt.core.QFileSystemWatcher;
 import com.trolltech.qt.core.QIODevice;
 import com.trolltech.qt.core.QMimeData;
+import com.trolltech.qt.core.QObject;
 import com.trolltech.qt.core.QTextCodec;
 import com.trolltech.qt.core.QTimer;
 import com.trolltech.qt.core.QUrl;
@@ -195,7 +197,7 @@ public class BrowserWindow extends QWidget {
 
 	//NoteNet view areas
 	private final ContentView linksViewer;
-	private final ContentView activationViewer;
+	private final QWebView activationViewer;
 
 	public final QPushButton undoButton;
 	public final QAction	undoAction;
@@ -276,6 +278,7 @@ public class BrowserWindow extends QWidget {
 	public long	unblockTime;
 	private final QTimer setSourceTimer;
 	String latexGuid;  // This is set if we are editing an existing LaTeX formula.  Useful to track guid.
+	private QBridge bridge;
 
 	
 	public static class SuggestionListener implements SpellCheckListener {
@@ -432,11 +435,14 @@ public class BrowserWindow extends QWidget {
 		linksViewer.setFont(linksFont);
 		
 		//Setup the activation viewer
-		activationViewer = new ContentView(this);
+		activationViewer = new QWebView();
 		activationViewer.page().setLinkDelegationPolicy(
 				QWebPage.LinkDelegationPolicy.DelegateAllLinks);
+		bridge = new QBridge(this);
+		activationViewer.page().mainFrame().addToJavaScriptWindowObject("bridge", bridge);
 		activationViewer.setVisible(true);
-		activationViewer.linkClicked.connect(this, "linkClicked(QUrl)");
+//		activationViewer.linkClicked.connect(this, "linkClicked(QUrl)");
+		activationViewer.page().mainFrame().evaluateJavaScript("bridge.test();");
 		QFont activationFont = new QFont();
 		activationFont.setFamily("Courier");
 		activationFont.setFixedPitch(true);
@@ -3527,7 +3533,6 @@ public class BrowserWindow extends QWidget {
 	
 	// Show activated notes in activation viewer
 	private void setSuggested(){
-		int summaryLength = 100;
 		String activationText = "You might also be interested in<br><br>";
 		List<ActivationNode> activeNotes = Global.activatedNotes.getActivatedNotes();
 		User user = Global.getUserInformation();
@@ -3537,15 +3542,23 @@ public class BrowserWindow extends QWidget {
 			if(act.getNoteGuid()==this.currentNote.getGuid()) continue;
 			Note note = conn.getNoteTable().getNote(act.getNoteGuid(), true, false, false, false, false);
 			String noteURL =  "evernote:///view/" + user.getId() + "/" + user.getShardId() + "/" + note.getGuid() + "/" + note.getGuid() + "/";
-			String title = "<a title=\"" + noteURL + " style=\" color:#69aa35\"\"=\"\" href=\"" + noteURL + "style=\"color:#69aa35\">" + note.getTitle() + "</a>";
+			String link = "<a title=\"" + noteURL + " style=\" color:#69aa35\"\"=\"\" href=\"" + noteURL + ">";// "style=\"color:#69aa35\">";
+			String title = note.getTitle();
 			Document doc = Jsoup.parse(note.getContent());
 			Elements elements = doc.select("p");
 			String summary = elements.first().html();
-			String style = "style = \"float: left; width: 180px; height: 150px; padding: 20 20 20 20; overflow: hidden;\"";
-			activationText += "<div " + style + ">" + title + "<br><p>"+ summary + "<p></div>";
+			String style = "style = \"float: left; width: 180px; height: 150px; padding: 20 20 20 20; overflow: hidden; cursor: pointer;\"";
+//			bridge.callMethod("clicked", currentNodeId);
+			String onclick = "onclick = \" bridge.callMethod(\'clicked\',\'" + act.getNoteGuid() + "\');\"";
+			activationText += "<div " + style + onclick + ">" + title + "<br><p>"+ summary + "<p></div>";
 			count++;
 		}
 		activationViewer.setHtml(activationText);
+		activationViewer.page().mainFrame().addToJavaScriptWindowObject("bridge", bridge);
+	}
+	
+	public void clicked(String guid){
+		Global.view.selectionSignal.emit(guid);
 	}
 
 	// show/hide view source window
