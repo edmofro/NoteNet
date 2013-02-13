@@ -90,6 +90,7 @@ public class Global {
     public static final int indexThread04Id=8;   // unused
     public static final int dbThreadId=9;   // This should always be the highest thread ID
     public static final int threadCount = 10;
+	public static final String ApplicationName = "NoteNet";
 	public static int MAX_ACTIVATED = 20; // Size of the priority queue of activated notes
 	public static double FADE_PROPORTION = 0.25; // Amount of deactivation each iteration
 	public static double LINK_STRENGTH_FINDRELATED = 0.4; // Strength of link between notes returned by a findRelated query
@@ -207,6 +208,7 @@ public class Global {
 	
 	//Visualizer
 	public static VisualizerWindow view;
+	public static boolean loadPdfs = false;
 	
     // Do initial setup 
     public static void setup(StartupConfig startupConfig) throws InitializationException  {

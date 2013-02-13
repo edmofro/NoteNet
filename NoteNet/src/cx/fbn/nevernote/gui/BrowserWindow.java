@@ -803,8 +803,8 @@ public class BrowserWindow extends QWidget {
 		saveNoteTitle = n.getTitle();
 		if(Global.linksTable.setup){
 			if(linksViewer.isVisible()) setLinks();
-			Global.activatedNotes.activate(n.getGuid(), 1, null, -1);
 			Global.activatedNotes.fadeActivation(Global.FADE_PROPORTION);
+			Global.activatedNotes.activate(n.getGuid(), 1, null, -1);
 			if(activationViewer.isVisible()) setSuggested();
 		}
 	}
@@ -3546,6 +3546,7 @@ public class BrowserWindow extends QWidget {
 			String title = note.getTitle();
 			Document doc = Jsoup.parse(note.getContent());
 			Elements elements = doc.select("p");
+			if(elements==null || elements.first() == null) continue;
 			String summary = elements.first().html();
 			String style = "style = \"float: left; width: 180px; height: 150px; padding: 20 20 20 20; overflow: hidden; cursor: pointer;\"";
 //			bridge.callMethod("clicked", currentNodeId);

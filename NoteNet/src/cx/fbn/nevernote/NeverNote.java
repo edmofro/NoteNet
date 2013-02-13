@@ -417,7 +417,7 @@ public class NeverNote extends QMainWindow{
 		QApplication.setStyle(Global.getStyle());
 		if (Global.useStandardPalette())
 			QApplication.setPalette(QApplication.style().standardPalette());
-        setWindowTitle(tr("NixNote"));
+        setWindowTitle(tr(Global.ApplicationName));
 
         mainLeftRightSplitter = new QSplitter();
         setCentralWidget(mainLeftRightSplitter);
@@ -855,7 +855,7 @@ public class NeverNote extends QMainWindow{
 	public static void main(String[] args) {
 		log.setLevel(Level.FATAL);
 		QApplication.initialize(args);
-		QPixmap pixmap = new QPixmap("classpath:cx/fbn/nevernote/icons/splash_logo.png");
+		QPixmap pixmap = new QPixmap("classpath:cx/fbn/nevernote/icons/notenet_splash.png");
 		QSplashScreen splash = new QSplashScreen(pixmap);
 		boolean showSplash;
 		
@@ -948,7 +948,7 @@ public class NeverNote extends QMainWindow{
 	public static void visualizeMain(String[] args, VisualizerWindow view) {
 		log.setLevel(Level.FATAL);
 		QApplication.initialize(args);
-		QPixmap pixmap = new QPixmap("classpath:cx/fbn/nevernote/icons/splash_logo.png");
+		QPixmap pixmap = new QPixmap("classpath:cx/fbn/nevernote/icons/notenet_splash.png");
 		QSplashScreen splash = new QSplashScreen(pixmap);
 		boolean showSplash;
 		

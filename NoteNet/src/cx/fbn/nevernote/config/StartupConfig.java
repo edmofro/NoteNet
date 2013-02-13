@@ -17,7 +17,7 @@ public class StartupConfig {
     private String programDirPath;
     private boolean disableViewing = false;
     private boolean syncOnly = false;
-
+ 
 
     public String getName() {
         return name;

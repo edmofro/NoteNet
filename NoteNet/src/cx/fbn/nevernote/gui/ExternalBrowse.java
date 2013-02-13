@@ -49,7 +49,7 @@ public class ExternalBrowse extends QMdiSubWindow {
 	// Constructor
 	public ExternalBrowse(DatabaseConnection c) {
 		setAttribute(WidgetAttribute.WA_QuitOnClose, false);
-		setWindowTitle(tr("NixNote"));
+		setWindowTitle(tr(Global.ApplicationName));
 		conn = c;
 		contentsChanged = new Signal4<String, String, Boolean, BrowserWindow>();
 		windowClosing = new Signal1<String>();

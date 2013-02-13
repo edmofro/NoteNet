@@ -28,6 +28,8 @@ import javax.imageio.ImageIO;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 
+import cx.fbn.nevernote.Global;
+
 public class PDFPreview {
 
 	public int getPageCount(String filePath) {
@@ -47,6 +49,7 @@ public class PDFPreview {
 	
     // Setup the preview for PDFs
     public boolean setupPreview(String filePath, String appl, int pageNumber) {
+    	if(!Global.loadPdfs) return false;
 		// Fix stupid Windows file separation characters
     	String whichOS = System.getProperty("os.name");
 		if (whichOS.contains("Windows")) {
