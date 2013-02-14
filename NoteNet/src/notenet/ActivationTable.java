@@ -69,6 +69,8 @@ public class ActivationTable{
 			String name = "";
 			if(Global.linksTable!=null)
 				name = Global.linksTable.getName(guid);
+			if(name.isEmpty()) //Links database does not include this node yet 
+				return;
 			act = new ActivationNode(guid, name, actChange);
 			insert(act);
 			if(Global.view != null) Global.view.add(act, from, linkStrength);
