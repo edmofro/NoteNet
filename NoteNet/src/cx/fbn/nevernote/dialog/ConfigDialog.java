@@ -67,7 +67,7 @@ public class ConfigDialog extends QDialog {
 		pagesWidget = new QStackedWidget(this);
 		fontPage = new ConfigFontPage(this);
 		connectionPage = new ConfigConnectionPage(this);
-		appearancePage = new ConfigAppearancePage(this);
+		appearancePage = new ConfigAppearancePage(parent);
 		indexPage = new ConfigIndexPage(this);
 		debugPage = new ConfigDebugPage(this);
 		spellPage = new ConfigSpellPage(this);
@@ -119,6 +119,8 @@ public class ConfigDialog extends QDialog {
 			Global.disableUploads = false;
 		Global.setDisableUploads(Global.disableUploads);
 		Global.setMimicEvernoteInterface(appearancePage.getMimicEvernote());
+		Global.setVisualisation(appearancePage.getVisualisation());		
+		Global.setResearcherMode(appearancePage.getResearcherMode());
 		Global.setMinimizeOnClose(appearancePage.getMinimizeOnClose());
 		
 		if (appearancePage.getShowSplashScreen())
@@ -298,6 +300,8 @@ public class ConfigDialog extends QDialog {
 		appearancePage.setAutoSaveInterval(Global.getAutoSaveInterval());
 		connectionPage.setAutomaticLogin(Global.automaticLogin());
 		appearancePage.setMimicEvernote(Global.getMimicEvernoteInterface());
+		appearancePage.setVisualisation(Global.getVisualisation());
+		appearancePage.setResearcherMode(Global.getResearcherMode());
 		appearancePage.setShowTrayIcon(Global.showTrayIcon());
 		connectionPage.setSynchronizeOnClose(Global.synchronizeOnClose());
 		connectionPage.setSyncronizeDeletedContent(Global.synchronizeDeletedContent());

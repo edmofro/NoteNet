@@ -53,6 +53,8 @@ public class ConfigAppearancePage extends QWidget {
 	private final QCheckBox	checkForUpdates;
 	private final QCheckBox newNoteWithTags;
 	private final QCheckBox	mimicEvernote;
+	private final QCheckBox	visualisation;
+	private final QCheckBox	researcherMode;
 	private final QCheckBox	startMinimized;
 	private final QCheckBox minimizeOnClose;
 	private final QCheckBox includeTagChildren;
@@ -140,6 +142,10 @@ public class ConfigAppearancePage extends QWidget {
 		datetimeGroup.setLayout(formatLayout);
 		
 		mimicEvernote = new QCheckBox(tr("Mimic Evernote Selection Behavior (Requires Restart)"));
+		visualisation = new QCheckBox(tr("Show Visualisation (Requires Restart)"));
+//		visualisation.clicked.connect(parent, "notenetPreferencesChanged()");
+		researcherMode = new QCheckBox(tr("Manipulate Spreading Activation Behaviour (Requires Restart)"));
+//		researcherMode.clicked.connect(parent, "notenetPreferencesChanged()");
 		showSplashScreen = new QCheckBox(tr("Show Splash Screen on Startup"));
 		showTrayIcon = new QCheckBox(tr("Minimize To Tray"));
 		minimizeOnClose = new QCheckBox(tr("Close To Tray"));
@@ -181,6 +187,8 @@ public class ConfigAppearancePage extends QWidget {
 		
 		QVBoxLayout checkboxLayout = new QVBoxLayout();
 		checkboxLayout.addWidget(mimicEvernote); 
+		checkboxLayout.addWidget(visualisation); 
+		checkboxLayout.addWidget(researcherMode); 
 		checkboxLayout.addLayout(startupNotebookLayout);
 		checkboxLayout.addWidget(showTrayIcon);
 		checkboxLayout.addWidget(minimizeOnClose);
@@ -365,7 +373,7 @@ public class ConfigAppearancePage extends QWidget {
 		else
 			QApplication.setPalette(Global.originalPalette);
 			
-	}
+	} 
 
 	
 	//*****************************************
@@ -404,6 +412,26 @@ public class ConfigAppearancePage extends QWidget {
 	}
 	public void setMimicEvernote(boolean val) {
 		mimicEvernote.setChecked(val);
+	}
+	
+	//*****************************************
+	//* Show Visualisation
+	//*****************************************
+	public boolean getVisualisation() {
+		return visualisation.isChecked();
+	}
+	public void setVisualisation(boolean val) {
+		visualisation.setChecked(val);
+	}
+	
+	//*****************************************
+	//* Researcher Mode
+	//*****************************************
+	public boolean getResearcherMode() {
+		return researcherMode.isChecked();
+	}
+	public void setResearcherMode(boolean val) {
+		researcherMode.setChecked(val);
 	}
 
 	

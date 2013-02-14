@@ -194,6 +194,8 @@ public class Global {
 	public static HashMap<String, ArrayList<String>> 	invalidAttributes = new HashMap<String, ArrayList<String>>();
 	
 	public static boolean mimicEvernoteInterface; // Try to mimic Evernote or allow multiple notebook selection
+	public static boolean showVisualisation; // Try to mimic Evernote or allow multiple notebook selection
+	public static boolean researcherMode; // Try to mimic Evernote or allow multiple notebook selection
 	public static HashMap<String,String> resourceMap;   // List of attachments for a note.
 	public static String cipherPassword = "";    // If the database is encrypted, this stores the password
 	public static String databaseCache = "16384";  // Default DB cache size
@@ -243,6 +245,8 @@ public class Global {
 		logger = new ApplicationLogger("global.log");  // Setup log for this class 
 		shortcutKeys = new ShortcutKeys();  // Setup keyboard shortcuts.
 		mimicEvernoteInterface = getMimicEvernoteInterface();  // Should we mimic Evernote's notebook behavior
+		showVisualisation = getVisualisation();  // Should we show the vis
+		researcherMode = getResearcherMode();  // Should we allow activation manipulation
 		resourceMap = new HashMap<String,String>();  // Setup resource map used to store attachments when editing
 			
 		databaseCache = getDatabaseCacheSize();	 // Set database cache size	
@@ -1197,6 +1201,56 @@ public class Global {
     		settings.setValue("mimicEvernoteInterface", "true");
     	else
     		settings.setValue("mimicEvernoteInterface", "false"); 
+    	settings.endGroup();
+    }
+ 
+    // Should we show the visualisation?
+    public static boolean getVisualisation() {
+		settings.beginGroup("General");
+		try {
+			String text = (String)settings.value("visualisation", "true");
+			settings.endGroup();
+			if (text.equalsIgnoreCase("true"))
+				return true;
+			else
+				return false;
+		} catch (java.lang.ClassCastException e) {
+			Boolean value = (Boolean) settings.value("visualisation", true);
+			settings.endGroup();
+			return value;
+		}
+    }
+    public static void setVisualisation(boolean value) {
+    	settings.beginGroup("General");
+    	if (value)
+    		settings.setValue("visualisation", "true");
+    	else
+    		settings.setValue("visualisation", "false"); 
+    	settings.endGroup();
+    }
+    
+    // Should we allow manipulation of spreading activation?
+    public static boolean getResearcherMode() {
+		settings.beginGroup("General");
+		try {
+			String text = (String)settings.value("researcherMode", "true");
+			settings.endGroup();
+			if (text.equalsIgnoreCase("true"))
+				return true;
+			else
+				return false;
+		} catch (java.lang.ClassCastException e) {
+			Boolean value = (Boolean) settings.value("researcherMode", true);
+			settings.endGroup();
+			return value;
+		}
+    }
+    public static void setResearcherMode(boolean value) {
+    	settings.beginGroup("General");
+    	if (value)
+    		settings.setValue("researcherMode", "true");
+    	else
+    		settings.setValue("researcherMode", "false"); 
     	settings.endGroup();
     }
     

@@ -234,7 +234,6 @@ public class NeverNote extends QMainWindow{
     TableView	 			noteTableView;				// 	List of notes (the widget).
 
     public VisualizerWindow	visualizerWindow;			// Window containing visualization of activation network 
-    boolean					visualize = true;			// Display visualization of activation network?
     public VisualizerParameters visualizerParameters;	// Allow manipulation of parameters underlying algorithm
     
     public BrowserWindow	browserWindow;				// Window containing browser & labels
@@ -568,10 +567,12 @@ public class NeverNote extends QMainWindow{
         
         //Visualizer window init
         visualizerWindow = new VisualizerWindow(this);
-        visualizerWindow.setVisible(visualize);
-        visualizerWindow.show();
-        visualizerWindow.selectionSignal.connect(this, "noteClicked(String)");
-        Global.view = visualizerWindow;
+        if(Global.showVisualisation || Global.researcherMode){
+        	visualizerWindow.setVisible(Global.showVisualisation || Global.researcherMode);        
+        	visualizerWindow.show();        
+        	visualizerWindow.selectionSignal.connect(this, "noteClicked(String)");
+        	Global.view = visualizerWindow;
+        }
         visualizerParameters = new VisualizerParameters();
         visualizerParameterSplitter = new QSplitter();
         visualizerParameterSplitter.setOrientation(Qt.Orientation.Vertical);
@@ -584,8 +585,12 @@ public class NeverNote extends QMainWindow{
         visualizerSplitter.addWidget(browserIndexSplitter);
         visualizerSplitter.addWidget(visualizerParameterSplitter);
         
-        visualizerParameterSplitter.addWidget(visualizerParameters);
-        visualizerParameterSplitter.addWidget(visualizerWindow);
+        if(Global.researcherMode){
+        	visualizerParameterSplitter.addWidget(visualizerParameters);
+            visualizerParameterSplitter.addWidget(visualizerWindow);
+        } else if (Global.showVisualisation){
+            visualizerParameterSplitter.addWidget(visualizerWindow);
+        }
         
         if (Global.getListView() == Global.View_List_Wide) {
         	browserIndexSplitter.addWidget(noteTableView);
@@ -839,6 +844,43 @@ public class NeverNote extends QMainWindow{
 		if (Global.checkVersionUpgrade())
 			checkForUpdates();
 		
+	}
+	
+	/** Showing/hiding visualization or researcher mode
+	 * 	Doesn't work well as it only deals with turning things on if everything is off
+	 */
+	public void notenetPreferencesChanged(){
+//		System.out.println("Prefs changed");
+//		if(Global.showVisualisation || Global.researcherMode){
+//			System.out.println("Showing vis");
+//        	visualizerWindow.setVisible(Global.showVisualisation || Global.researcherMode);        
+//        	visualizerWindow.show();        
+//        	visualizerWindow.selectionSignal.connect(this, "noteClicked(String)");
+//        	Global.view = visualizerWindow;
+//        }       
+//        if(Global.researcherMode){
+//			System.out.println("Researcher mode");
+//        	visualizerParameterSplitter.addWidget(visualizerParameters);
+//            visualizerParameterSplitter.addWidget(visualizerWindow);
+//        } else if (Global.showVisualisation){
+//			System.out.println("Just vis");
+//            visualizerParameterSplitter.addWidget(visualizerWindow);
+//        }
+//        if(Global.researcherMode){
+//			System.out.println("Researcher mode toolbar");
+//	    	clearActivationButton = toolBar.addAction(tr("Clear Current Activation"));
+//	    	QIcon clearActivationIcon = new QIcon(iconPath+"resetActivation.png");
+//	    	clearActivationButton.triggered.connect(this, "clearActivation()");
+//	    	clearActivationButton.setIcon(clearActivationIcon);
+//	    	toggleClearActivationButton(Global.isToolbarButtonVisible("clearActivation"));
+//    	
+//	    	undoActivationButton = toolBar.addAction(tr("Undo Last Activation"));
+//	    	QIcon undoActivationIcon = new QIcon(iconPath+"undoActivation.png");
+//	    	undoActivationButton.triggered.connect(this, "undoActivation()");
+//	    	undoActivationButton.setIcon(undoActivationIcon);
+//	    	toggleUndoActivationButton(Global.isToolbarButtonVisible("undoActivation"));
+//    	}
+    	
 	}
 	
 	
@@ -3182,17 +3224,20 @@ public class NeverNote extends QMainWindow{
     	refreshLinksButton.setIcon(refreshLinksIcon);
     	toggleRefreshLinksButton(Global.isToolbarButtonVisible("refreshLinks"));
     	
-    	clearActivationButton = toolBar.addAction(tr("Clear Current Activation"));
-    	QIcon clearActivationIcon = new QIcon(iconPath+"resetActivation.png");
-    	clearActivationButton.triggered.connect(this, "clearActivation()");
-    	clearActivationButton.setIcon(clearActivationIcon);
-    	toggleClearActivationButton(Global.isToolbarButtonVisible("clearActivation"));
+    	if(Global.researcherMode){
+	    	clearActivationButton = toolBar.addAction(tr("Clear Current Activation"));
+	    	QIcon clearActivationIcon = new QIcon(iconPath+"resetActivation.png");
+	    	clearActivationButton.triggered.connect(this, "clearActivation()");
+	    	clearActivationButton.setIcon(clearActivationIcon);
+	    	toggleClearActivationButton(Global.isToolbarButtonVisible("clearActivation"));
     	
-    	undoActivationButton = toolBar.addAction(tr("Undo Last Activation"));
-    	QIcon undoActivationIcon = new QIcon(iconPath+"undoActivation.png");
-    	undoActivationButton.triggered.connect(this, "undoActivation()");
-    	undoActivationButton.setIcon(undoActivationIcon);
-    	toggleUndoActivationButton(Global.isToolbarButtonVisible("undoActivation"));
+	    	undoActivationButton = toolBar.addAction(tr("Undo Last Activation"));
+	    	QIcon undoActivationIcon = new QIcon(iconPath+"undoActivation.png");
+	    	undoActivationButton.triggered.connect(this, "undoActivation()");
+	    	undoActivationButton.setIcon(undoActivationIcon);
+	    	toggleUndoActivationButton(Global.isToolbarButtonVisible("undoActivation"));
+    	}
+    	
     	
      	//toolBar.addSeparator();
       	//toolBar.addWidget(new QLabel(tr("Quota:")));
@@ -4393,7 +4438,6 @@ public class NeverNote extends QMainWindow{
     	
     	mainLeftRightSplitter.addWidget(noteTableView);
     	mainLeftRightSplitter.addWidget(browserWindow);
-//    	mainLeftRightSplitter.addWidget(visualizerWindow);
     	
     	restoreWindowState(false);
     	noteTableView.repositionColumns();
@@ -4434,7 +4478,6 @@ public class NeverNote extends QMainWindow{
     	browserIndexSplitter.setVisible(true);
         browserIndexSplitter.addWidget(noteTableView);
         browserIndexSplitter.addWidget(browserWindow);
-//        browserIndexSplitter.addWidget(visualizerWindow);
         restoreWindowState(false);
     	noteTableView.repositionColumns();
     	noteTableView.resizeColumnWidths();
