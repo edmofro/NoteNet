@@ -441,8 +441,6 @@ public class BrowserWindow extends QWidget {
 		bridge = new QBridge(this);
 		activationViewer.page().mainFrame().addToJavaScriptWindowObject("bridge", bridge);
 		activationViewer.setVisible(true);
-//		activationViewer.linkClicked.connect(this, "linkClicked(QUrl)");
-		activationViewer.page().mainFrame().evaluateJavaScript("bridge.test();");
 		QFont activationFont = new QFont();
 		activationFont.setFamily("Courier");
 		activationFont.setFixedPitch(true);
@@ -698,7 +696,7 @@ public class BrowserWindow extends QWidget {
 		
 		setSourceTimer = new QTimer();
 		setSourceTimer.timeout.connect(this, "setSource()");
-		
+				
 		logger.log(logger.HIGH, "Browser setup complete");
 	}
 
@@ -801,11 +799,14 @@ public class BrowserWindow extends QWidget {
 		if (n == null)
 			n = new Note();
 		saveNoteTitle = n.getTitle();
-		if(Global.linksTable.setup){
+		if(Global.linksTable.containsNote(n.getGuid())){
 			if(linksViewer.isVisible()) setLinks();
 			Global.activatedNotes.fadeActivation(Global.FADE_PROPORTION);
 			Global.activatedNotes.activate(n.getGuid(), 1, null, -1);
 			if(activationViewer.isVisible()) setSuggested();
+		} else {
+			String iconFile = iconPath + "refreshLinks-small.png";
+			activationViewer.setHtml("<p>\"<i>" + n.getTitle() + "</i>\" has not yet been linked to related notes. To see suggestions, first create your note network by clicking the <img src=\"" +iconFile + "\" width=\"30\" height=\"30\"/>network button.</p>");
 		}
 	}
 
@@ -3530,6 +3531,7 @@ public class BrowserWindow extends QWidget {
 		}
 		linksViewer.setHtml(linksText);		
 	}
+	
 	
 	// Show activated notes in activation viewer
 	private void setSuggested(){

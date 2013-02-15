@@ -82,7 +82,6 @@ public class FileManager {
         qssDir = new File(programDir, "qss");
         checkExistingReadableDir(qssDir);
         qssDirPath = slashTerminatePath(qssDir.getPath());
-        
         qssDirUser = new File(homeDir, "qss");
         createDirOrCheckWriteable(qssDirUser);
         qssDirPathUser = slashTerminatePath(qssDirUser.getPath());
